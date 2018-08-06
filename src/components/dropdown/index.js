@@ -12,7 +12,6 @@ import {
   ViewPropTypes,
   I18nManager,
 } from 'react-native';
-import Ripple from 'react-native-material-ripple';
 import { TextField } from 'react-native-material-textfield';
 
 import DropdownItem from '../item';
@@ -42,21 +41,7 @@ export default class Dropdown extends PureComponent {
       max: 16,
     },
 
-    rippleCentered: false,
-    rippleSequential: true,
-
-    rippleInsets: {
-      top: 16,
-      right: 0,
-      bottom: -8,
-      left: 0,
-    },
-
-    rippleOpacity: 0.54,
-    shadeOpacity: 0.12,
-
-    rippleDuration: 400,
-    animationDuration: 225,
+    animationDuration: 125,
 
     fontSize: 16,
 
@@ -108,21 +93,6 @@ export default class Dropdown extends PureComponent {
 
     dropdownPosition: PropTypes.number,
 
-    rippleColor: PropTypes.string,
-    rippleCentered: PropTypes.bool,
-    rippleSequential: PropTypes.bool,
-
-    rippleInsets: PropTypes.shape({
-      top: PropTypes.number,
-      right: PropTypes.number,
-      bottom: PropTypes.number,
-      left: PropTypes.number,
-    }),
-
-    rippleOpacity: PropTypes.number,
-    shadeOpacity: PropTypes.number,
-
-    rippleDuration: PropTypes.number,
     animationDuration: PropTypes.number,
 
     fontSize: PropTypes.number,
@@ -163,7 +133,6 @@ export default class Dropdown extends PureComponent {
     this.onSelect = this.onSelect.bind(this);
     this.onLayout = this.onLayout.bind(this);
 
-    this.updateRippleRef = this.updateRef.bind(this, 'ripple');
     this.updateContainerRef = this.updateRef.bind(this, 'container');
     this.updateScrollRef = this.updateRef.bind(this, 'scroll');
 
@@ -208,7 +177,6 @@ export default class Dropdown extends PureComponent {
       disabled,
       onFocus,
       itemPadding,
-      rippleDuration,
       dropdownOffset,
       dropdownMargins: { min: minMargin, max: maxMargin },
       animationDuration,
@@ -222,15 +190,6 @@ export default class Dropdown extends PureComponent {
 
     let itemCount = data.length;
     let timestamp = Date.now();
-
-    if (null != event) {
-      /* Adjust event location */
-      event.nativeEvent.locationY -= this.rippleInsets().top;
-      event.nativeEvent.locationX -= this.rippleInsets().left;
-
-      /* Start ripple directly from event */
-      this.ripple.startRipple(event);
-    }
 
     if (!itemCount) {
       return;
@@ -252,7 +211,7 @@ export default class Dropdown extends PureComponent {
         x = dimensions.width - (x + containerWidth);
       }
 
-      let delay = Math.max(0, rippleDuration - animationDuration - (Date.now() - timestamp));
+      let delay = Math.max(0, animationDuration - (Date.now() - timestamp));
       let selected = this.selectedIndex();
 
       let leftInset;
@@ -344,11 +303,10 @@ export default class Dropdown extends PureComponent {
       valueExtractor,
       onChangeText,
       animationDuration,
-      rippleDuration,
     } = this.props;
 
     let value = valueExtractor(data[index], index);
-    let delay = Math.max(0, rippleDuration - animationDuration);
+    let delay = Math.max(0, animationDuration);
 
     if ('function' === typeof onChangeText) {
       onChangeText(value, index, data);
@@ -403,17 +361,6 @@ export default class Dropdown extends PureComponent {
 
   tailItemCount() {
     return Math.max(this.visibleItemCount() - 2, 0);
-  }
-
-  rippleInsets() {
-    let {
-      top = 16,
-      right = 0,
-      bottom = -8,
-      left = 0,
-    } = this.props.rippleInsets || {};
-
-    return { top, right, bottom, left };
   }
 
   resetScrollOffset() {
@@ -518,37 +465,6 @@ export default class Dropdown extends PureComponent {
     );
   }
 
-  renderRipple() {
-    let {
-      baseColor,
-      rippleColor = baseColor,
-      rippleOpacity,
-      rippleDuration,
-      rippleCentered,
-      rippleSequential,
-    } = this.props;
-
-    let { bottom, ...insets } = this.rippleInsets();
-    let style = {
-      ...insets,
-
-      height: this.itemSize() - bottom,
-      position: 'absolute',
-    };
-
-    return (
-      <Ripple
-        style={style}
-        rippleColor={rippleColor}
-        rippleDuration={rippleDuration}
-        rippleOpacity={rippleOpacity}
-        rippleCentered={rippleCentered}
-        rippleSequential={rippleSequential}
-        ref={this.updateRippleRef}
-      />
-    );
-  }
-
   renderAccessory() {
     let { baseColor: backgroundColor } = this.props;
     let triangleStyle = { backgroundColor };
@@ -580,8 +496,6 @@ export default class Dropdown extends PureComponent {
       disabledItemColor = baseColor,
       fontSize,
       itemTextStyle,
-      rippleOpacity,
-      rippleDuration,
       shadeOpacity,
     } = this.props;
 
@@ -590,10 +504,6 @@ export default class Dropdown extends PureComponent {
     let { style, disabled }
       = props
       = {
-        rippleDuration,
-        rippleOpacity,
-        rippleColor: baseColor,
-
         shadeColor: baseColor,
         shadeOpacity,
 
@@ -644,11 +554,6 @@ export default class Dropdown extends PureComponent {
       containerStyle,
       overlayStyle: overlayStyleOverrides,
       pickerStyle: pickerStyleOverrides,
-
-      rippleInsets,
-      rippleOpacity,
-      rippleCentered,
-      rippleSequential,
 
       hitSlop,
       pressRetentionOffset,
@@ -729,7 +634,6 @@ export default class Dropdown extends PureComponent {
         <TouchableWithoutFeedback {...touchableProps}>
           <View pointerEvents='box-only'>
             {this.renderBase(props)}
-            {this.renderRipple()}
           </View>
         </TouchableWithoutFeedback>
 
