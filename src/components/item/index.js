@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import {
+  TouchableOpacity,
   TouchableNativeFeedback,
+  Platform,
   View,
 } from 'react-native';
 
 import styles from './styles';
+
+const Touchable = Platform.OS == 'ios' ? TouchableOpacity : TouchableNativeFeedback;
 
 export default class DropdownItem extends PureComponent {
   static defaultProps = {
@@ -37,7 +41,7 @@ export default class DropdownItem extends PureComponent {
     let { children, style, index, ...props } = this.props;
 
     return (
-      <TouchableNativeFeedback
+      <Touchable
         {...props}
 
         onPress={this.onPress}
@@ -47,7 +51,7 @@ export default class DropdownItem extends PureComponent {
         >
           {children}
         </View>
-      </TouchableNativeFeedback>
+      </Touchable>
     );
   }
 }
